@@ -5,7 +5,7 @@ Installation guide:
   1. after cloning, go to app/config/auth.js and replace the facebook and google credentials with yours.
   2. go to app/config/config.json and replace the database name, url, host, username and password with yours.
   
-  - install node 6 in your system(use nvm to sitch between different node versions).
+  - install node 6 in your system and switch to node 6 (use nvm to sitch between different node versions).
   - navigate to root directory and run npm install .
   - After installing node modules, run npm start.
   - open http://localhost:5000 and first sighnup and sign in.
