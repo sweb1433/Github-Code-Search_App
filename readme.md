@@ -8,7 +8,7 @@ Installation guide:
   - install node 6 in your system.
   - navigate to root directory and run npm install .
   - After installing node modules, run npm start.
-  - open http://localhost:8080 and first sighnup and sign in.
+  - open http://localhost:5000 and first sighnup and sign in.
   - 
   # Usage
 - After Login, three section will be there
