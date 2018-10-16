@@ -1,0 +1,476 @@
+<!-- views/profile.ejs -->
+<!doctype html>
+<html>
+<head>
+	<title>Github Search</title>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+
+	<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+	<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+	
+	<style>
+		body 		{ padding-top:80px; word-wrap:break-word; }
+		h3, .h3 {
+			font-size: 16px;
+		}
+		.btn-primary {
+			margin-top: 10px;
+		}
+	</style>
+</head>
+<body>
+<div class="container">
+
+	<div class="page-header text-center">
+		<h1><span class="fa fa-anchor"></span> Profile Page</h1>
+		<a href="/logout" class="btn btn-default btn-sm">Logout</a>
+	</div>
+
+	<div class="row">
+<!-- Search Result -->
+			<div class="col-sm-4">
+					<div class="well">
+						<h3 class="text-primary">Your Code Search History</h3>
+		
+						<div id="code_history"></div>
+		
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="well">
+						<h3 class="text-primary">Your Repo Search History</h3>
+		
+						<div id="repo_history"></div>
+		
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="well">
+						<h3 class="text-primary">Your User Search History</h3>
+		
+						<div id="User_history"></div>
+		
+					</div>
+				</div>
+
+		<!-- LOCAL INFORMATION -->
+		<!-- <div class="col-sm-6">
+			<div class="well">
+				<h3><span class="fa fa-user"></span> Local</h3>
+
+					<p>
+						<strong>id</strong>: <%= user._id %><br>
+						<strong>email</strong>: <%= user.local.username %><br>
+						<strong>password</strong>: <%= user.local.password %>
+					</p>
+
+			</div>
+		</div> -->
+
+		 <!-- FACEBOOK INFORMATION -->
+        <!-- <div class="col-sm-6">
+            <div class="well">
+                <h3 class="text-primary"><span class="fa fa-facebook"></span> Facebook</h3>
+
+                <p>
+                    <strong>id</strong>: <%= user.facebook.id %><br>
+                    <strong>token</strong>: <%= user.facebook.token %><br>
+                    <strong>email</strong>: <%= user.facebook.email %><br>
+                    <strong>name</strong>: <%= user.facebook.name %>
+                </p>
+
+            </div>
+		</div> -->
+	</div>
+	<div class="row">
+		
+		<div class="col-sm-4">
+            <div class="well" style="    height: 209px;">
+				<h3 class="text-primary">Search code on Github</h3>
+				<div id="message_code"></div>
+
+                <!-- <form action="#" onsubmit="fetch_details()"> -->
+					<input type="text" class="form-control" style="width: 70%; " id="keyword" placeholder="Enter Keyword (Optional)">
+					<select class="form-control form-control-lg" id="mySelect" style="width: 70%; margin-top: 10px;">
+						<option selected>Select Language</option>
+						<option name="caveofprogramming/java-beginners">Java</option>
+						<option name="robbyrussell/oh-my-zsh">PHP</option>
+						<option name="h5bp/html5-boilerplate">HTML</option>
+						<option name="ruby/ruby">Ruby</option>
+						<option name="grpc/grpc">JavaScript</option>
+						<option name="airbnb/css" >CSS</option>
+						<option name="DefinitelyTyped/DefinitelyTyped">TypeScript</option>
+
+					  </select>
+					  <button type="submit" id="code" onclick="fetch_code()" class="btn btn-primary mb-2">Search</button>
+					<!-- <input type="submit"  value="Submit"> -->
+				  <!-- </form>  -->
+
+            </div>
+		</div>
+		<div class="col-sm-4">
+            <div class="well" style="    height: 209px;">
+				<h3 class="text-primary">Search Repository on Github</h3>
+				<div id="message_repo"></div>
+
+                <!-- <form action="#" onsubmit="fetch_details()"> -->
+					<input type="text" class="form-control" id="topic" style="width: 70%;" id="" placeholder="Enter Keyword">
+					  <button type="submit" id="repo" onclick="fetch_repo()" class="btn btn-primary mb-2">Search</button>
+					<!-- <input type="submit"  value="Submit"> -->
+				  <!-- </form>  -->
+
+            </div>
+		</div>
+		<div class="col-sm-4">
+            <div class="well" style="    height: 209px;">
+                <h3 class="text-primary">Search Users on Github</h3>
+
+                <!-- <form action="#" onsubmit="fetch_details()"> -->
+					<div id="message_user"></div>
+					<input type="text" class="form-control" id="repo_name" style="width: 70%;" id="" placeholder="Enter Name">
+					  <button type="submit" id="users" onclick="fetch_users()" class="btn btn-primary mb-2">Search</button>
+					<!-- <input type="submit"  value="Submit"> -->
+				  <!-- </form>  -->
+
+            </div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-12">
+				<div id = "parent">
+						<table id="example" class="display" style="width:100%"><table>
+			   </div>
+				
+		</div>
+	</div>
+
+</div>
+</body>
+<script>
+var code_names=[];
+var repo_names=[];
+var user_names=[];
+
+		var fetch_code =	async(loginName) => {
+			var x = document.getElementById("mySelect").selectedIndex;
+			var sel_name = document.getElementsByTagName("option")[x].value;
+			console.log(sel_name);
+			var repo_name;
+			if(sel_name === "Java"){
+				repo_name = "caveofprogramming/java-beginners";
+			}  
+			if(sel_name === "PHP"){
+				repo_name = "robbyrussell/oh-my-zsh"; 
+			}  
+			if(sel_name === "HTML"){
+				repo_name = "h5bp/html5-boilerplate"; 
+			}  
+			if(sel_name === "Ruby"){
+				repo_name = "ruby/ruby"; 
+				console.log(repo_name);
+			}   
+			if(sel_name === "CSS"){
+				repo_name = "airbnb/css"; 
+			}
+			if(sel_name === "TypeScript"){
+				repo_name = "DefinitelyTyped/DefinitelyTyped"; 
+			}  
+			if(sel_name === "JavaScript"){
+				repo_name = "airbnb/javascript"; 
+			}   
+			var code_keyWord = document.querySelector("#keyword").value;
+			code_names.push(code_keyWord);
+			localStorage.setItem("code_names", JSON.stringify(code_names));
+
+			var parent = document.getElementById("parent");
+			var child = document.getElementById("example");
+			var xyz = document.getElementById("example_wrapper");
+			
+			
+			child.remove();
+			if(xyz)
+		   {
+			   xyz.remove(); 
+		   }
+			$('#example').DataTable( {});
+			var para = document.createElement("table");
+			document.getElementsByTagName("table")[0].setAttribute("id", "example"); 
+			parent.appendChild(para);
+			if(sel_name !== "Select Language"){
+				try {
+					if(code_keyWord!==""){
+					var response = await fetch(`https://api.github.com/search/code?q=${code_keyWord}+in:file+language:${sel_name}+repo:${repo_name}` , { headers: {
+						"Accept": "application/vnd.github.v3.text-match+json"
+					}});
+					var json = await response.json();
+					//var followerList = json.map(user => user.login);
+					console.log(json);
+					var temp1 = json;
+					var newArr2 = [];
+					for(i=0;i<temp1.items.length;i++){
+						var newArr = [];
+						newArr.push(temp1.items[i].text_matches[0].matches[0].text);
+						newArr.push(temp1.items[i].text_matches[0].fragment);
+						newArr.push(temp1.items[i].text_matches[0].matches[0].indices[0]);
+						newArr.push(temp1.items[i].name	);
+						newArr.push(`<a href=${temp1.items[i].html_url}>`+temp1.items[i].html_url+"</a>");
+
+						newArr2.push(newArr);
+
+					}
+					console.log(newArr2)
+					$('#example').DataTable( {
+						data: newArr2,
+						columns: [
+							{ title: "Keyword" },
+							{ title: "Code" },
+							{ title: "First match" },
+							{ title: "file" },
+							{ title: "URL" }
+						]
+					});
+				}
+				else {
+					var response = await fetch(`https://api.github.com/search/code?q=file+language:${sel_name}+repo:${repo_name}`);
+					var json = await response.json();
+					//var followerList = json.map(user => user.login);
+					console.log(json);
+					var temp1 = json;
+					var newArr2 = [];
+					for(i=0;i<temp1.items.length;i++){
+						var newArr = [];
+						newArr.push(temp1.items[i].repository.owner.login);
+						newArr.push(temp1.items[i].repository.full_name);
+						newArr.push(temp1.items[i].name	);
+						newArr.push(`<a href=${temp1.items[i].repository.html_url}>`+temp1.items[i].repository.html_url+"</a>");
+
+						newArr2.push(newArr);
+
+					}
+					console.log(newArr2)
+					$('#example').DataTable( {
+						data: newArr2,
+						columns: [
+							{ title: "Name" },
+							{ title: "Repo Name" },
+							{ title: "File Name" },
+							{ title: "URL" },
+							
+						]
+					});
+
+				}
+				} catch(e) {
+					console.log("Data didn't load", e);
+				}
+			
+			}
+			else{
+				document.getElementById("message_code").innerHTML = "Please Select language.";
+				setTimeout(function(){document.getElementById("message_code").innerHTML = "";},3000);
+	
+			}
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+		
+		var fetch_repo =	async() => {
+			const topic = document.querySelector("#topic").value;
+			repo_names.push(topic);
+			localStorage.setItem("repo_names", JSON.stringify(repo_names));
+
+			var parent = document.getElementById("parent");
+        	var child = document.getElementById("example");
+        	var xyz = document.getElementById("example_wrapper");
+			
+        	child.remove();
+        	if(xyz)
+    		{
+        	   xyz.remove(); 
+        	}
+        	$('#example').DataTable( {});
+        	var para = document.createElement("table");
+        	document.getElementsByTagName("table")[0].setAttribute("id", "example"); 
+			parent.appendChild(para);
+			if(topic!==''){
+				try {
+					var response = await fetch(`https://api.github.com/search/repositories?q=topic:${topic}`);
+					var json = await response.json();
+					//var followerList = json.map(user => user.login);
+					console.log(json);
+					var temp1 = json;
+					var newArr2 = [];
+					for(i=0;i<temp1.items.length;i++){
+						var newArr = [];
+						newArr.push(temp1.items[i].full_name);
+						newArr.push(`<a href=${temp1.items[i].html_url}>`+temp1.items[i].html_url+"</a>");
+
+						newArr.push(temp1.items[i].owner.login);
+						newArr.push(temp1.items[i].owner.type	);
+
+
+						newArr2.push(newArr);
+
+					}
+					console.log(newArr2)
+					$('#example').DataTable( {
+						data: newArr2,
+						columns: [
+							{ title: "Repo Name" },
+							{ title: "URL" },
+							{ title: "Owner" },
+							{ title: "Type" }
+						]
+					});
+				} catch(e) {
+					console.log("Data didn't load", e);
+				}
+			}else{
+				document.getElementById("message_repo").innerHTML = "Please enter name of repo.";
+        	    setTimeout(function(){document.getElementById("message_repo").innerHTML = "";},3000);
+			}
+		}
+	
+		var fetch_users =	async() => {
+			const repo_name = document.querySelector("#repo_name").value;
+			user_names.push(repo_name);
+			localStorage.setItem("user_names", JSON.stringify(user_names));
+
+			console.log(repo_name);
+			var parent = document.getElementById("parent");
+      		var child = document.getElementById("example");
+      		var xyz = document.getElementById("example_wrapper");
+
+      		child.remove();
+      		if(xyz)
+      		 {
+      		     xyz.remove(); 
+      		 }
+      		$('#example').DataTable( {});
+      		var para = document.createElement("table");
+      		document.getElementsByTagName("table")[0].setAttribute("id", "example"); 
+      		parent.appendChild(para);
+			if(repo_name!==''){
+			   try {
+				var response = await fetch(`https://api.github.com/search/users?q=${repo_name}+repos:%3E5+followers:%3E3`, { headers: {
+					"Accept": "application/vnd.github.v3.text-match+json"
+				}});
+				var json = await response.json();
+				var newArr2 = [];
+				//var followerList = json.map(user => user.login);
+				//console.log(json);
+				var temp1  = json;
+				
+				console.log(temp1.items.length)
+				for(i=0;i<temp1.items.length;i++){
+					var newArr = [];
+					newArr.push(temp1.items[i].text_matches[0].fragment);
+					newArr.push(temp1.items[i].login);
+
+					newArr.push(`<a href=${temp1.items[i].html_url}>`+temp1.items[i].html_url+"</a>");
+
+					newArr2.push(newArr);
+				}
+				//console.log(newArr2);
+				$('#example').DataTable( {
+					data: newArr2,
+					columns: [
+						{ title: "Name" },
+						{ title: "Username" },
+						{ title: "URL" },
+						//{ title: "Email" }
+					]
+				});
+			  } catch(e) {
+				console.log("Data didn't load", e);
+			    }
+		    }
+			else{
+				document.getElementById("message_user").innerHTML = "Please enter name of user.";
+        	    setTimeout(function(){document.getElementById("message_user").innerHTML = "";},3000);
+			}
+		}
+		
+	
+		var i;
+		var storedCodeNames = JSON.parse(localStorage.getItem("code_names"));
+		console.log(storedCodeNames);
+		if(storedCodeNames){
+		if(storedCodeNames.length >= 5){
+		for(i=0;i<5;i++){
+			//console.log(storedNames[i]);
+				document.getElementById('code_history').innerHTML+="<p>"+storedCodeNames[i]+"</p>";
+			
+		}
+	}else{
+		for(name in storedCodeNames){
+			document.getElementById('code_history').innerHTML+="<p>"+storedCodeNames[name]+"</p>";
+		}
+	}
+}
+
+
+		var storedRepoNames = JSON.parse(localStorage.getItem("repo_names"));
+		console.log(storedRepoNames);
+		if(storedRepoNames){
+		if(storedRepoNames.length >= 5){
+		for(i=0;i<5;i++){
+			//console.log(storedNames[i]);
+				document.getElementById('repo_history').innerHTML+="<p>"+storedRepoNames[i]+"</p>";
+			
+		}
+	}else{
+		for(name in storedRepoNames){
+			document.getElementById('repo_history').innerHTML+="<p>"+storedRepoNames[name]+"</p>";
+		}
+	}
+}
+
+		var storedUserNames = JSON.parse(localStorage.getItem("user_names"));
+		console.log(storedUserNames);
+		if(storedUserNames){
+		if(storedUserNames.length >= 5){
+		for(i=0;i<5;i++){
+			//console.log(storedNames[i]);
+				document.getElementById('User_history').innerHTML+="<p>"+storedUserNames[i]+"</p>";
+			
+		}
+	}else{
+		for(name in storedUserNames){
+			document.getElementById('User_history').innerHTML+="<p>"+storedUserNames[name]+"</p>";
+		}
+	}
+}
+
+	
+</script>
+
+</html>
