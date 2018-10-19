@@ -1,5 +1,7 @@
 # Node-Express based Github Code Search App
 
+link for live app - https://boiling-dawn-34535.herokuapp.com/
+
 
 Installation guide:
   1. after cloning, go to app/config/auth.js and replace the facebook and google credentials with yours.
